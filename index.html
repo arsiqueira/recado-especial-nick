@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Recado Especial - Acesso Restrito</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #0d0d0d;
+            color: #9b5de5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animação de fundo estilo Matrix */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* Terminal Hacker Style */
+        .terminal {
+            background: rgba(13, 13, 13, 0.95);
+            border: 3px solid #9b5de5;
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: 0 0 40px rgba(155, 93, 229, 0.5),
+                        inset 0 0 30px rgba(155, 93, 229, 0.1);
+            animation: terminalGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes terminalGlow {
+            from { box-shadow: 0 0 40px rgba(155, 93, 229, 0.5), inset 0 0 30px rgba(155, 93, 229, 0.1); }
+            to { box-shadow: 0 0 60px rgba(155, 93, 229, 0.8), inset 0 0 40px rgba(155, 93, 229, 0.2); }
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .terminal-btn {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #ff006e;
+        }
+
+        .terminal-btn:nth-child(2) { background: #ffbe0b; }
+        .terminal-btn:nth-child(3) { background: #00f5ff; }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(16px, 4vw, 24px);
+            text-align: center;
+            margin-bottom: 15px;
+            color: #00f5ff;
+            text-shadow: 0 0 20px #00f5ff, 0 0 40px #00f5ff;
+            animation: flicker 3s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            45% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #ff006e;
+            margin-bottom: 30px;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .ascii-art {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #9b5de5;
+            text-align: center;
+            margin: 20px 0;
+            line-height: 1.2;
+        }
+
+        .input-group {
+            margin: 30px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #00f5ff;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 245, 255, 0.05);
+            border: 2px solid #9b5de5;
+            border-radius: 8px;
+            color: #00f5ff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00f5ff;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        .btn-unlock {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #9b5de5, #8a2be2);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(155, 93, 229, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-unlock:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(155, 93, 229, 0.6);
+        }
+
+        .btn-unlock:active {
+            transform: translateY(0);
+        }
+
+        .btn-unlock::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-unlock:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 0, 110, 0.1);
+            border: 2px solid #ff006e;
+            border-radius: 8px;
+            color: #ff006e;
+            text-align: center;
+            font-weight: 700;
+            animation: glitchError 0.3s infinite;
+            display: none;
+        }
+
+        @keyframes glitchError {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+        }
+
+        /* Carta Secreta */
+        .secret-letter {
+            display: none;
+            animation: fadeIn 1s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .letter-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .letter-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(16px, 4vw, 22px);
+            color: #ffbe0b;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #ffbe0b;
+            animation: sparkle 1.5s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { text-shadow: 0 0 20px #ffbe0b, 0 0 30px #ffbe0b; }
+            50% { text-shadow: 0 0 30px #ffbe0b, 0 0 50px #ffbe0b, 0 0 70px #ff006e; }
+        }
+
+        .letter-content {
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.9), rgba(155, 93, 229, 0.1));
+            border: 3px solid #9b5de5;
+            border-radius: 15px;
+            padding: 35px 30px;
+            line-height: 1.9;
+            font-size: 17px;
+            color: #e8e8e8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 300px;
+            box-shadow: 
+                0 0 30px rgba(155, 93, 229, 0.4),
+                inset 0 0 40px rgba(155, 93, 229, 0.05),
+                0 8px 32px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decoração de canto estilo RPG */
+        .letter-content::before,
+        .letter-content::after {
+            content: '✦';
+            position: absolute;
+            font-size: 24px;
+            color: #00f5ff;
+            text-shadow: 0 0 10px #00f5ff;
+            z-index: 1;
+        }
+
+        .letter-content::before {
+            top: 15px;
+            left: 15px;
+        }
+
+        .letter-content::after {
+            bottom: 15px;
+            right: 15px;
+        }
+
+        .message-intro {
+            font-size: 20px;
+            color: #ff99cc;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .message-body {
+            color: #e8e8e8;
+            text-align: left;
+        }
+
+        .letter-content p {
+            margin-bottom: 18px;
+        }
+
+        .signature {
+            text-align: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(155, 93, 229, 0.3);
+            font-style: italic;
+            color: #ff006e;
+            font-size: 16px;
+        }
+
+        /* Efeito de loot/item obtido */
+        .loot-shine {
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%
+            );
+            animation: lootShine 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes lootShine {
+            0% { top: -100%; }
+            50% { top: 100%; }
+            100% { top: 100%; }
+        }
+
+        /* Animação de Portal */
+        .portal-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 20%, #0d0d0d 80%);
+            display: none;
+            z-index: 1000;
+            animation: portalOpen 2s;
+        }
+
+        @keyframes portalOpen {
+            0% { 
+                opacity: 0;
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(2) rotate(360deg);
+            }
+        }
+
+        .glitch {
+            animation: glitch 0.5s;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+            40% { transform: translate(5px, -5px); filter: hue-rotate(180deg); }
+            60% { transform: translate(-5px, -5px); filter: hue-rotate(270deg); }
+            80% { transform: translate(5px, 5px); filter: hue-rotate(360deg); }
+        }
+
+        /* Confetti Neon */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #00f5ff;
+            position: absolute;
+            animation: confettiFall 3s linear;
+            z-index: 999;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .terminal {
+                padding: 30px 20px;
+            }
+            
+            .ascii-art {
+                font-size: 8px;
+            }
+
+            .letter-content {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas class="bg-animation" id="bgCanvas"></canvas>
+    <div class="portal-animation" id="portalAnim"></div>
+    
+    <div class="container">
+        <div class="terminal" id="loginTerminal">
+            <div class="terminal-header">
+                <div class="terminal-btn"></div>
+                <div class="terminal-btn"></div>
+                <div class="terminal-btn"></div>
+            </div>
+
+            <h1>RECADO ESPECIAL</h1>
+            <p class="subtitle">▶ ACESSO RESTRITO ◀</p>
+
+            <div class="ascii-art">
+    ╔═══════════════════════════╗<br>
+    ║   🎮 SISTEMA PROTEGIDO 🎮  ║<br>
+    ║      LEVEL: MÁXIMO        ║<br>
+    ╚═══════════════════════════╝
+            </div>
+
+            <div class="input-group">
+                <label for="trackingCode">⚡ CÓDIGO DE RASTREIO ⚡</label>
+                <input 
+                    type="text" 
+                    id="trackingCode" 
+                    placeholder="Digite o código..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <button class="btn-unlock" onclick="unlockPortal()">
+                🔓 DESBLOQUEAR RECADO 🔓
+            </button>
+
+            <div class="error-message" id="errorMsg">
+                ❌ ACCESS DENIED ❌<br>
+                CÓDIGO INVÁLIDO
+            </div>
+        </div>
+
+        <div class="secret-letter" id="secretLetter">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-btn"></div>
+                    <div class="terminal-btn"></div>
+                    <div class="terminal-btn"></div>
+                </div>
+
+                <div class="letter-header">
+                    <div class="letter-title" id="letterTitle"></div>
+                </div>
+
+                <div class="letter-content">
+                    <div class="loot-shine"></div>
+                    <div id="letterText"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animação de fundo estilo Matrix
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = '01アイウエオカキクケコサシスセソタチツテト';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(13, 13, 13, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#9b5de5';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Hash SHA-256
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Criar confetti neon
+        function createConfetti() {
+            const colors = ['#00f5ff', '#ff006e', '#9b5de5', '#ffbe0b'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // Efeito de máquina de escrever (renderiza HTML)
+        function typeWriter(element, htmlContent, speed = 30) {
+            // Remove espaços em branco extras
+            htmlContent = htmlContent.trim();
+            
+            // Primeiro renderiza o HTML completo (invisível)
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlContent;
+            tempDiv.style.visibility = 'hidden';
+            tempDiv.style.position = 'absolute';
+            document.body.appendChild(tempDiv);
+            
+            // Pega o texto sem tags HTML
+            const textContent = tempDiv.innerText || tempDiv.textContent;
+            document.body.removeChild(tempDiv);
+            
+            // Agora renderiza o HTML completo de uma vez
+            element.innerHTML = htmlContent;
+            
+            // Aplica animação de fade-in
+            element.style.opacity = '0';
+            setTimeout(() => {
+                element.style.transition = 'opacity 1.5s ease-in';
+                element.style.opacity = '1';
+            }, 100);
+        }
+
+        // Desbloquear portal
+        async function unlockPortal() {
+            const input = document.getElementById('trackingCode');
+            const code = input.value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (!code) {
+                errorMsg.style.display = 'block';
+                setTimeout(() => errorMsg.style.display = 'none', 2000);
+                return;
+            }
+
+            const hash = await sha256(code);
+            const correctHash = '53e1d0487e647fa575b536e8334571154c3e0943c4be4762bf904e0ecddb16c1';
+
+            if (hash === correctHash) {
+                // Animação de sucesso
+                const terminal = document.getElementById('loginTerminal');
+                terminal.classList.add('glitch');
+                
+                // Portal animation
+                const portal = document.getElementById('portalAnim');
+                portal.style.display = 'block';
+                
+                // Confetti
+                createConfetti();
+                
+                // Som de sucesso
+                playSuccessSound();
+                
+                setTimeout(() => {
+                    terminal.style.display = 'none';
+                    portal.style.display = 'none';
+                    
+                    const letter = document.getElementById('secretLetter');
+                    letter.style.display = 'block';
+                    
+                    // Título com efeito typewriter
+                    const title = document.getElementById('letterTitle');
+                    typeWriter(title, '✨RECADO DESBLOQUEADO✨', 80);
+                    
+                    // Conteúdo da carta
+                    setTimeout(() => {
+                        const content = document.getElementById('letterText');
+                        const message = `
+                            <div class="message-intro">Nickolas, meu bem, meu benzinho, meu gatinho 💜</div>
+                            <div class="message-body">
+                                <p>Isso vai muito além de um presente: um pedacinho do que você tem me feito sentir. Esse microfone não é sobre gastar dinheiro ou te agradar — é sobre o quanto eu admiro a sua voz (e em você claro) e acredito que ela tem força para ir muito mais longe. Eu quis dar porque senti, porque meu coração pediu. Quando você canta, eu encontro calma, encontro ânimo, encontro fé.</p>
+                                
+                                <p>Você fez coisas que ninguém nunca fez por mim, principalmente em relação a respeito. Você diz que é "o mínimo" — mas para mim é o máximo que já recebi. Você nem imagina o quanto me fez bem nesse pouco tempo.</p>
+                                
+                                <p>Eu sei que você me disse que não quer um relacionamento agora, e volto a dizer que não era a minha intenção e de novo se isso interferir ou mudar o que estávamos sendo, oia eu te capo kkk. Mas preciso que saiba: não criei expectativas, não idealizei nada. Só tenho aproveitado cada momento ao seu lado. Me sinto leve, segura, confortável.</p>
+                                
+                                <p>Carrego marcas do passado, dores que ainda trato na terapia, mas você, sem perceber, tem curado pedacinhos em mim só pelo jeito de ser. Você é incrível — mesmo com as cicatrizes da vida, mesmo tão jovem (e eu odeio jovens), transmite uma alegria que toca quem está por perto.</p>
+                                
+                                <p>Quando ouço sua voz no louvor, minha fé se fortalece. Você não canta apenas notas, você ministra vida, paz e esperança. Creio que Deus vai usar sua voz para alcançar muitos corações. Desde que te conheci, você está nas minhas orações e sempre estará. <em>"Dou graças ao meu Deus toda vez que me lembro de vocês. Em todas as minhas orações em favor de vocês, sempre oro com alegria."</em> (Filipenses 1:3-4)</p>
+                                
+                                <p>Talvez eu seja intensa, talvez eu sinta demais — mas esse é o meu jeito. Eu acredito no poder das conexões verdadeiras, e você é uma delas. Entrei naquele trem do Facebook sem nenhuma intenção e encontrei você. De repente virei "Nickolete" kkk, e hoje não consigo imaginar não ter cruzado seu caminho.</p>
+                                
+                                <p>Meu bem, se um dia a vida bagunçar os caminhos e você se afastar, saiba que é alguém que eu caçaria sem pensar duas vezes. Você merece tanto, mas tanto… e eu torço, oro e acredito na sua prosperidade, nos seus sonhos, no seu futuro.</p>
+                                
+                                <p>Esse presente é pequeno perto do tamanho da admiração que sinto. Espero que ele seja útil, que te inspire, que te lembre do quanto é especial. Mas, se não usar, já aviso: vou ter que cantar no seu lugar, e ninguém merece isso kkk 🎤😂</p>
+                            </div>
+                            <div class="signature">
+                                Com muito carinho, respeito e admiração,<br>
+                                da sua fã, <strong>Amandinha</strong> ❤️
+                            </div>
+                        `;
+                        typeWriter(content, message, 20);
+                    }, 2000);
+                    
+                }, 2000);
+                
+            } else {
+                // Erro
+                errorMsg.style.display = 'block';
+                terminal.classList.add('glitch');
+                playErrorSound();
+                
+                setTimeout(() => {
+                    errorMsg.style.display = 'none';
+                    terminal.classList.remove('glitch');
+                }, 2000);
+            }
+        }
+
+        // Sons 8-bit simples usando Web Audio API
+        function playSuccessSound() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C, E, G, C
+            
+            notes.forEach((freq, i) => {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.frequency.value = freq;
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.2);
+                
+                oscillator.start(audioCtx.currentTime + i * 0.1);
+                oscillator.stop(audioCtx.currentTime + i * 0.1 + 0.2);
+            });
+        }
+
+        function playErrorSound() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.frequency.value = 200;
+            oscillator.type = 'sawtooth';
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        }
+
+        // Permitir Enter para desbloquear
+        document.getElementById('trackingCode').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                unlockPortal();
+            }
+        });
+    </script>
+</body>
+</html>
